@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello</title>
+    <!-- link do bootstrapa w html -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- script do funkcjonowania jquery w html -->
+    <script
+            src="https://code.jquery.com/jquery-3.4.1.js"
+            integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+            crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="input-group">
+        <input id="currencyExchangePlnInput" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+        <div class="input-group-append">
+            <span class="input-group-text">PLN</span>
+        </div>
+    </div>
+    <div class="input-group">
+        <input id="currencyExchangeDateInput" type="date" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+        <div class="input-group-append">
+            <span class="input-group-text">DATE</span>
+        </div>
+    </div>
+    <div class="form-group col-md-4">
+        <label for="inputCurrency">Currency</label>
+        <select id="inputCurrency" class="form-control">
+            <option selected>Choose...</option>
+        </select>
+    </div>
+    <button id="currencyExchangeButton" type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false"
+        autocomplete="off">
+        Przelicz
+    </button>
+</body>
+
+<!--dobranie się do przycisku po id -->
+<!-- $( document ).ready(function() wykonuje sie od razu po zaladowaniu dokument -->
+<script>
+
+    $( document ).ready(function() {
+        console.log( "ready!" );
+        $.ajax({
+            type: 'GET',
+            url: '/currency',
+            headers:{
+                'Accept':'application/json'
+            },
+            success: function (result) {
+                var option = $('#inputCurrency');
+                $.each(result, function(key) {
+                    option.append('<option>' + result[key] + '</option>');
+                })
+            },
+            error: function (result) {
+                $('#currencyExchangePlnInput').val('ERROR');
+            }
+
+        });
+    });
+
+    $('#currencyExchangeButton').click(function () {
+        var enteredDate = $('#currencyExchangeDateInput').val();
+        var enteredValue = $('#currencyExchangePlnInput').val();
+        var enteredCurrency = $('#inputCurrency').val();
+
+        $.ajax({
+            type: 'GET',
+            url: '/exchange/'+enteredValue+'/'+enteredDate+'/'+enteredCurrency,
+            headers:{
+                'Accept':'application/json'
+            },
+            success: function (result) {
+                console.log(result);
+                $('#currencyExchangePlnInput').val(result.result);
+            },
+            error: function (result) {
+                $('#currencyExchangePlnInput').val('ERROR');
+            }
+
+        });
+
+
+    });
+</script>
+
+</html>
